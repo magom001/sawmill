@@ -1,6 +1,38 @@
 import gql from 'graphql-tag';
 
-export const AllLengths = gql`{
+export const ALLWAREHOUSES = gql`{
+  allWarehouses {
+    nodes {
+      id
+      name
+    }
+  }
+}`;
+
+export const DOCTYPES = gql`query AllDoctypes($category: String) {
+  allDoctypes(condition:{
+    category: $category
+  }) {
+    nodes {
+      id
+      docname
+    }
+  }
+}`;
+
+export const ALLEMPLOYEES = gql`{
+  allEmployees {
+    nodes {
+      id
+      firstname
+      middlename
+      lastname
+      profession
+    }
+  }
+}`
+
+export const ALLLENGTHS = gql`{
   allLengths {
     nodes {
       id
@@ -53,18 +85,17 @@ export const DocDetailsQuery = gql`query ProductionReportDetails($doctype: Int, 
   }
 }`;
 
-export const ProductionReportsQuery = gql `
-query ListOfProductionReports($doctype: Int, $year: Int, $month: Int){
-allDocuments(condition: {
-  doctype: $doctype,
+export const LISTOFREPORTS = gql `
+query LISTOFREPORTS($category: String, $year: Int, $month: Int){
+allDocumentsViews(condition: {
+  category: $category,
   docyear: $year,
   docmonth:$month
 }) {
   nodes {
     doctype
-    doctypeByDoctype {
-      docname
-    }
+    category
+    docname
     docnum
     docyear
     docmonth
@@ -75,7 +106,7 @@ allDocuments(condition: {
 }
 `;
 
-export const ProductionReportQuery = gql `query ProductionReport($doctype: Int!, $year: Int!, $docnum: Int!, $wh:Int!){
+export const REPORTQUERY = gql `query ProductionReport($doctype: Int!, $year: Int!, $docnum: Int!, $wh:Int!){
   documentByDoctypeAndDocnumAndDocyearAndWh(doctype:$doctype,docnum:$docnum,docyear:$year, wh:$wh) {
     doctype
     docnum
@@ -85,6 +116,7 @@ export const ProductionReportQuery = gql `query ProductionReport($doctype: Int!,
       docname
     }
     docdate
+    employee
     employeeByEmployee {
       id
       firstname

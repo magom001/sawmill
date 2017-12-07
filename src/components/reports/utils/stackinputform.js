@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import {Table, Form, Dropdown, Button, Icon} from 'semantic-ui-react';
 import {graphql, compose} from 'react-apollo';
-import {AllSpecies, AllDimensions, AllLengths, DocDetailsQuery} from '../../../queries';
+import {AllSpecies, AllDimensions, ALLLENGTHS, DocDetailsQuery} from '../../../queries';
 import {CreateNewStack} from '../../../mutations';
 
 class StackInputForm extends Component {
@@ -44,9 +44,10 @@ class StackInputForm extends Component {
           }
         },
       }).then(({ data }) => {
-        this.setState({id:'',speciesid:1,dimensionid:null,lengthid:1, quantity:0});
+        let newid = parseInt(this.state.id,10)+1;
+        this.setState({id:newid});
       }).catch((error) => {
-        console.log('there was an error sending the query', error);
+        alert(error.message);
       });
     }
   }
@@ -95,7 +96,7 @@ class StackInputForm extends Component {
 export default compose(
   graphql(AllSpecies, {name: 'allspecies'}),
   graphql(AllDimensions, {name:'alldimensions'}),
-  graphql(AllLengths, {name:'alllengths'}),
+  graphql(ALLLENGTHS, {name:'alllengths'}),
   graphql(CreateNewStack, {name:'createnewstack',
     options: (props) => ({
       refetchQueries: [

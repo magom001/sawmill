@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import {withRouter} from 'react-router-dom';
 import {graphql} from 'react-apollo';
-import {ProductionReportsQuery} from '../../../queries/';
+import {LISTOFREPORTS} from '../../../queries/';
 import {Table} from 'semantic-ui-react';
 
 class ProductionReportsTable extends Component {
@@ -14,7 +14,7 @@ class ProductionReportsTable extends Component {
         <div>Загрузка...</div>
       )
     } else {
-      const docs = this.props.data.allDocuments.nodes;
+      const docs = this.props.data.allDocumentsViews.nodes;
       let rows;
       if (docs.length === 0) {
         rows = <Table.Row>
@@ -24,7 +24,7 @@ class ProductionReportsTable extends Component {
         rows = docs.map((d, i) => {
           return (
             <Table.Row key={i} onClick={() => this.handleRowClick(d.doctype, d.docyear, d.docnum, d.wh)}>
-              <Table.Cell>{d.doctypeByDoctype.docname}</Table.Cell>
+              <Table.Cell>{d.docname}</Table.Cell>
               <Table.Cell>{d.docnum}/{d.docyear}</Table.Cell>
               <Table.Cell>{d.docdate}</Table.Cell>
             </Table.Row>
@@ -54,12 +54,14 @@ class ProductionReportsTable extends Component {
   }
 }
 ProductionReportsTable = withRouter(ProductionReportsTable);
-export default graphql(ProductionReportsQuery, {
+export default graphql(LISTOFREPORTS, {
   options: (props) => ({
     variables: {
-      "doctype": 1,
+      "category": "выпуск",
       "year": parseInt(props.year, 10),
       "month": parseInt(props.month, 10)
-    }
-  })
+    },
+    fetchPolicy: 'network-only'
+  }),
+
 })(ProductionReportsTable);

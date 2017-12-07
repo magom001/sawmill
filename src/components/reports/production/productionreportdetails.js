@@ -1,31 +1,53 @@
 import React, {Component} from 'react';
-import {graphql} from 'react-apollo';
-import {ProductionReportQuery} from '../../../queries';
+import {graphql, compose} from 'react-apollo';
+import {REPORTQUERY} from '../../../queries';
+import {UPDATEDOCUMENT} from '../../../mutations';
 import ProductionReportDetailsTable from './productionreportdetailstable';
-import {Form, TextArea} from 'semantic-ui-react';
+import CommentaryInput from '../utils/doccommentaryinput';
 
 class ProductionReportDetails extends Component {
-
+  changeCommentary = (commentary) => {
+    const {doctype,docyear, docnum, wh} = this.props.match.params;
+    console.log(doctype, docyear, docnum, wh);
+    this.props.updatedocument({
+      variables: {
+        "input": {
+          "doctype": parseInt(doctype, 10),
+          "docyear": parseInt(docyear, 10),
+          "docnum": parseInt(docnum, 10),
+          "wh": parseInt(wh, 10),
+          "documentPatch": {
+            "commentary": String(commentary)
+          }
+        }
+      }
+    })
+  }
   render() {
-    if (this.props.data.loading) {
+    if (this.props.productionreportquery.loading) {
       return <div>Загрузка...</div>
     } else {
-      const doc = this.props.data.documentByDoctypeAndDocnumAndDocyearAndWh;
+      const doc = this.props.productionreportquery.documentByDoctypeAndDocnumAndDocyearAndWh;
       return (
         <div>
-          <h3>Отчёт о выпуске сушильных штабелей № {`${doc.docnum}/${doc.docyear} от ${doc.docdate}`}</h3>
-          <span>Мастер: {`${doc.employeeByEmployee.lastname} ${doc.employeeByEmployee.firstname} ${doc.employeeByEmployee.middlename}`}</span>
+          <center>
+            <h3>{`${doc.doctypeByDoctype.docname} #${doc.docnum}/${doc.docyear} от ${doc.docdate}`}</h3>
+          </center>
+          <br />
+
+          <p>
+            Мастер: {`${doc.employeeByEmployee.lastname} ${doc.employeeByEmployee.firstname} ${doc.employeeByEmployee.middlename}`}
+          </p>
           <ProductionReportDetailsTable doctype={doc.doctype} docnum={doc.docnum} docyear={doc.docyear} wh={doc.wh}/>
-          <Form>
-            <TextArea placeholder="Комментарий к документу" value={doc.commentary}/>
-          </Form>
+          <CommentaryInput commentary={doc.commentary} save={this.changeCommentary}/>
         </div>
       );
     }
   }
 }
 
-export default graphql(ProductionReportQuery, {
+export default compose(graphql(REPORTQUERY, {
+  name: 'productionreportquery',
   options: (props) => ({
     variables: {
       "doctype": parseInt(props.match.params.doctype, 10),
@@ -34,4 +56,4 @@ export default graphql(ProductionReportQuery, {
       "wh": parseInt(props.match.params.wh, 10)
     }
   })
-})(ProductionReportDetails);
+}), graphql(UPDATEDOCUMENT, {name: 'updatedocument'}))(ProductionReportDetails);
