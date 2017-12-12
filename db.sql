@@ -76,7 +76,7 @@ CREATE FUNCTION assign_docnum(doctype integer, docyear integer) RETURNS integer
 declare
 newdocnum integer;
 begin
-select coalesce(max(doc.docnum),0)+1 into newdocnum from document doc where doc.doctype = $1 and doc.docyear = $2;
+select coalesce(max(doc.docnum),0)+1 into newdocnum from factory.document doc where doc.doctype = $1 and doc.docyear = $2;
 return newdocnum;
 end;
 $_$;
@@ -210,7 +210,7 @@ CREATE FUNCTION trigger_assign_docnum() RETURNS trigger
     LANGUAGE plpgsql
     AS $$
 begin
-new.docnum :=assign_docnum(new.doctype, new.docyear);
+new.docnum :=factory.assign_docnum(new.doctype, new.docyear);
 return new;
 end;
 $$;
@@ -259,7 +259,8 @@ ALTER SEQUENCE dimension_id_seq OWNED BY dimension.id;
 CREATE TABLE doctype (
     id integer NOT NULL,
     docname text NOT NULL,
-    docsign integer NOT NULL
+    docsign integer NOT NULL,
+    category text
 );
 
 
@@ -295,11 +296,32 @@ CREATE TABLE documents_employees (
     docyear integer NOT NULL,
     docnum integer NOT NULL,
     wh integer NOT NULL,
-    employee integer NOT NULL
+    employee integer NOT NULL,
+    hours numeric,
+    CONSTRAINT documents_employees_hours_check CHECK ((hours <= (12)::numeric))
 );
 
 
 ALTER TABLE documents_employees OWNER TO magom001;
+
+--
+-- Name: documents_view; Type: VIEW; Schema: factory; Owner: magom001
+--
+
+CREATE VIEW documents_view AS
+ SELECT document.doctype,
+    doctype.category,
+    doctype.docname,
+    document.docnum,
+    document.docyear,
+    document.docmonth,
+    document.docdate,
+    document.wh
+   FROM (document
+     JOIN doctype ON ((document.doctype = doctype.id)));
+
+
+ALTER TABLE documents_view OWNER TO magom001;
 
 --
 -- Name: employee; Type: TABLE; Schema: factory; Owner: magom001
@@ -555,6 +577,14 @@ COPY dimension (id, thickness_mm, width_mm) FROM stdin;
 1	30	100
 2	30	125
 3	30	150
+4	14	72
+5	19	100
+6	22	100
+7	30	175
+8	30	200
+9	63	150
+10	63	175
+11	63	200
 \.
 
 
@@ -562,7 +592,7 @@ COPY dimension (id, thickness_mm, width_mm) FROM stdin;
 -- Name: dimension_id_seq; Type: SEQUENCE SET; Schema: factory; Owner: magom001
 --
 
-SELECT pg_catalog.setval('dimension_id_seq', 3, true);
+SELECT pg_catalog.setval('dimension_id_seq', 11, true);
 
 
 --
@@ -570,20 +600,24 @@ SELECT pg_catalog.setval('dimension_id_seq', 3, true);
 --
 
 COPY docdetail (doctype, docyear, docnum, stackid, wh, quantity) FROM stdin;
-1	2017	1	111	1	1000
-1	2017	1	112	1	1000
-1	2017	1	113	1	1000
-1	2017	1	114	1	999
-2	2017	1	114	1	999
-3	2017	1	114	2	999
-2	2017	2	111	1	1000
-3	2017	2	111	2	1000
-1	2017	1	115	1	777
-1	2017	1	116	1	666
-1	2017	1	117	1	555
-1	2017	1	118	1	555
-1	2017	1	119	1	988
-1	2017	1	120	1	500
+1	2017	1	202050	1	434
+1	2017	1	202051	1	434
+1	2017	1	202052	1	434
+1	2017	1	202053	1	434
+1	2017	1	202054	1	434
+1	2017	1	202055	1	434
+1	2017	1	202056	1	434
+1	2017	1	202057	1	434
+1	2017	1	202058	1	434
+1	2017	1	202059	1	434
+1	2017	1	202060	1	434
+1	2017	1	202061	1	434
+1	2017	1	202062	1	434
+1	2017	1	202063	1	434
+1	2017	1	202064	1	434
+1	2017	1	202065	1	434
+1	2017	1	202066	1	431
+1	2017	1	202067	1	200
 \.
 
 
@@ -591,10 +625,10 @@ COPY docdetail (doctype, docyear, docnum, stackid, wh, quantity) FROM stdin;
 -- Data for Name: doctype; Type: TABLE DATA; Schema: factory; Owner: magom001
 --
 
-COPY doctype (id, docname, docsign) FROM stdin;
-1	Выпуск сушильных штабелей	1
-2	Списание сушильных штабелей	-1
-3	Оприходование сушильных штабелей	1
+COPY doctype (id, docname, docsign, category) FROM stdin;
+3	Оприходование сушильных штабелей	1	\N
+1	Выпуск штабелей от ШФМ	1	выпуск
+2	Списание сушильных штабелей	-1	списание
 \.
 
 
@@ -610,11 +644,7 @@ SELECT pg_catalog.setval('doctype_id_seq', 3, true);
 --
 
 COPY document (doctype, docyear, docnum, docdate, wh, commentary, doctype_ref, docyear_ref, docnum_ref, wh_ref, employee, docmonth) FROM stdin;
-2	2017	1	2017-12-04	1	\N	\N	\N	\N	\N	1	12
-3	2017	1	2017-12-04	2	\N	\N	\N	\N	\N	1	12
-2	2017	2	2017-12-05	1	\N	\N	\N	\N	\N	1	12
-3	2017	2	2017-12-05	2	\N	2	2017	2	1	1	12
-1	2017	1	2017-12-02	1	Первый документ	\N	\N	\N	\N	1	12
+1	2017	1	2017-12-06	1	\N	\N	\N	\N	\N	3	12
 \.
 
 
@@ -622,7 +652,7 @@ COPY document (doctype, docyear, docnum, docdate, wh, commentary, doctype_ref, d
 -- Data for Name: documents_employees; Type: TABLE DATA; Schema: factory; Owner: magom001
 --
 
-COPY documents_employees (doctype, docyear, docnum, wh, employee) FROM stdin;
+COPY documents_employees (doctype, docyear, docnum, wh, employee, hours) FROM stdin;
 \.
 
 
@@ -632,6 +662,8 @@ COPY documents_employees (doctype, docyear, docnum, wh, employee) FROM stdin;
 
 COPY employee (id, firstname, lastname, profession, employedfrom, employedtill, middlename) FROM stdin;
 1	Иван	Иванов	станочник	2017-05-01	\N	Иванович
+3	Александр	Бутаков	мастер цеха	2017-08-01	\N	Николаевич
+4	Дмитрий	Сластихин	мастер цеха	2017-08-01	\N	Владимирович
 \.
 
 
@@ -639,7 +671,7 @@ COPY employee (id, firstname, lastname, profession, employedfrom, employedtill, 
 -- Name: employee_id_seq; Type: SEQUENCE SET; Schema: factory; Owner: magom001
 --
 
-SELECT pg_catalog.setval('employee_id_seq', 1, true);
+SELECT pg_catalog.setval('employee_id_seq', 4, true);
 
 
 --
@@ -681,16 +713,24 @@ SELECT pg_catalog.setval('species_id_seq', 2, true);
 --
 
 COPY stack (id, speciesid, dimensionid, lengthid, created_at) FROM stdin;
-111	1	1	1	2017-12-02 18:51:04.252033
-112	1	1	1	2017-12-02 18:51:04.252033
-113	1	2	1	2017-12-02 18:51:04.252033
-114	1	1	1	2017-12-04 14:26:40.613182
-115	1	1	1	2017-12-06 17:02:56.325712
-116	1	1	1	2017-12-06 17:07:06.281797
-117	1	2	1	2017-12-06 17:08:45.208638
-118	1	1	1	2017-12-06 17:09:32.541644
-119	1	3	1	2017-12-06 17:38:44.509884
-120	1	2	1	2017-12-06 18:10:19.749066
+202050	1	2	1	2017-12-07 19:13:46.755209
+202051	1	2	1	2017-12-07 19:17:43.003264
+202052	1	2	1	2017-12-07 19:20:59.249879
+202053	1	2	1	2017-12-07 19:21:38.881299
+202054	1	2	1	2017-12-07 19:21:46.367291
+202055	1	2	1	2017-12-07 19:21:49.817433
+202056	1	2	1	2017-12-07 19:21:55.528851
+202057	1	2	1	2017-12-07 19:21:59.862282
+202058	1	2	1	2017-12-07 19:22:02.857528
+202059	1	2	1	2017-12-07 19:22:09.62895
+202060	1	2	1	2017-12-07 19:22:13.949784
+202061	1	2	1	2017-12-07 19:22:20.39299
+202062	1	2	1	2017-12-07 19:22:24.605636
+202063	1	2	1	2017-12-07 19:22:34.834342
+202064	1	2	1	2017-12-07 19:22:39.085861
+202065	1	2	1	2017-12-07 19:22:45.616827
+202066	1	2	1	2017-12-07 19:23:25.002998
+202067	1	10	1	2017-12-07 19:28:21.494028
 \.
 
 

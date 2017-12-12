@@ -1,6 +1,20 @@
 import gql from 'graphql-tag';
 
-export const ALLWAREHOUSES = gql`{
+export const STACKSINWH = gql `query StacksInWh($wh:Int)
+{
+  allStockViews(condition: {
+    wh: $wh
+  }) {
+    nodes {
+      stackid
+      species
+      size
+      quantity
+    }
+  }
+}`;
+
+export const ALLWAREHOUSES = gql `{
   allWarehouses {
     nodes {
       id
@@ -9,7 +23,7 @@ export const ALLWAREHOUSES = gql`{
   }
 }`;
 
-export const DOCTYPES = gql`query AllDoctypes($category: String) {
+export const DOCTYPES = gql `query AllDoctypes($category: String) {
   allDoctypes(condition:{
     category: $category
   }) {
@@ -20,7 +34,7 @@ export const DOCTYPES = gql`query AllDoctypes($category: String) {
   }
 }`;
 
-export const ALLEMPLOYEES = gql`{
+export const ALLEMPLOYEES = gql `{
   allEmployees {
     nodes {
       id
@@ -32,7 +46,7 @@ export const ALLEMPLOYEES = gql`{
   }
 }`
 
-export const ALLLENGTHS = gql`{
+export const ALLLENGTHS = gql `{
   allLengths {
     nodes {
       id
@@ -41,7 +55,7 @@ export const ALLLENGTHS = gql`{
   }
 }`;
 
-export const AllDimensions = gql`{
+export const AllDimensions = gql `{
   allDimensions {
     nodes {
       id
@@ -51,7 +65,7 @@ export const AllDimensions = gql`{
   }
 }`;
 
-export const AllSpecies = gql`{
+export const AllSpecies = gql `{
   allSpecies {
     nodes {
       id
@@ -60,7 +74,7 @@ export const AllSpecies = gql`{
   }
 }`;
 
-export const DocDetailsQuery = gql`query ProductionReportDetails($doctype: Int, $year: Int, $docnum: Int){
+export const DocDetailsQuery = gql `query ProductionReportDetails($doctype: Int, $year: Int, $docnum: Int){
   allDocdetails(condition:{
     docnum:$docnum,
     doctype:$doctype,
@@ -101,6 +115,9 @@ allDocumentsViews(condition: {
     docmonth
     docdate
     wh
+    warehouse
+    whRef
+    warehouseRef
   }
 }
 }
@@ -112,7 +129,14 @@ export const REPORTQUERY = gql `query ProductionReport($doctype: Int!, $year: In
     docnum
     docyear
     wh
-    doctypeByDoctype{
+    warehouseByWh {
+      name
+    }
+    whRef
+    warehouseByWhRef {
+      name
+    }
+    doctypeByDoctype {
       docname
     }
     docdate

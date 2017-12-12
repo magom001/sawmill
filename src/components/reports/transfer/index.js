@@ -1,15 +1,15 @@
 import React, {Component} from 'react';
 import YearsTab from '../utils/yearstab';
 import MonthsTab from '../utils/monthstab';
-import ProductionReportsTable from './productionreportstable';
-import NewProductionDocModal from '../utils/newproductiondocmodal';
+import TransferReportsTable from './transferreportstable';
+import NewTransferDocModal from '../utils/newtransferdocmodal';
 
-class ProductionReports extends Component {
+class TransferReports extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      selectedYear: 2017,
-      selectedMonth: 12
+      selectedYear: (new Date()).getFullYear(),
+      selectedMonth: (new Date()).getMonth() + 1
     }
   }
   changeYear = (year) => {
@@ -27,13 +27,15 @@ class ProductionReports extends Component {
         <MonthsTab selectedMonth={this.state.selectedMonth} changeMonth={this.changeMonth}/>
         <br/>
         <br/>
-        <NewProductionDocModal doccat='выпуск' wh={1} doctype={1} />
-        <h1>Отчёты о выпуске штабелей</h1>
-        <ProductionReportsTable year={this.state.selectedYear} month={this.state.selectedMonth}/>
+        <NewTransferDocModal doccat="перемещение" wh={1} />
+
+        <h1>Отчёты о перемещении штабелей</h1>
+
+        <TransferReportsTable year={this.state.selectedYear} month={this.state.selectedMonth}/>
       </div>
     );
   }
 
 }
 
-export default ProductionReports;
+export default TransferReports;

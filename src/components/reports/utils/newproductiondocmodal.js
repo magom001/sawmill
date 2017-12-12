@@ -5,7 +5,7 @@ import {withRouter} from 'react-router-dom';
 import {ALLEMPLOYEES, DOCTYPES, ALLWAREHOUSES} from '../../../queries';
 import {CREATEDOCUMENT} from '../../../mutations';
 
-class NewDocModal extends Component {
+class NewProductionDocModal extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -18,6 +18,15 @@ class NewDocModal extends Component {
       error: ''
     }
   }
+
+
+  componentWillReceiveProps(nextProps) {
+    if(!nextProps.doctypes.loading) {
+      this.setState({doctype:nextProps.doctypes.allDoctypes.nodes[0].id})
+    }
+  }
+
+
   handleSubmit = () => {
     if (this.state.employee === null || this.state.employee === 0) {
       this.setState({error: "Выберите сотрудника, составившего отчет"})
@@ -168,9 +177,9 @@ class NewDocModal extends Component {
                   <Form.Dropdown width={3} onChange={(e, d) => this.changeMonth(d.value)} label="Месяц" fluid search selection value={this.state.month} options ={months}/>
                   <Form.Dropdown width={2} onChange={(e, d) => this.changeDay(d.value)} value={this.state.day} label="День" fluid search selection options ={days}/>
                 </Form.Group>
-                <Form.Dropdown label="Склад оприходования" value={this.state.wh} onChange={(e, d) => this.setState({wh: d.value})} fluid search selection options ={warehouses}/>
+                <Form.Dropdown label={this.props.doccat==='выпуск'?"Склад оприходования":"Склад списания"} value={this.state.wh} onChange={(e, d) => this.setState({wh: d.value})} fluid search selection options ={warehouses}/>
                 <Form.Dropdown onChange={(e, d) => this.setState({employee: d.value, error: ''})} value={this.state.employee} label="Выбрать сотрудника, составившего отчет" fluid search selection options ={employees}/>
-                <Form.Button content='Submit'/>
+                <Form.Button content='Создать'/>
               </Form>
             </Modal.Description>
           </Modal.Content>
@@ -187,4 +196,4 @@ export default withRouter(compose(graphql(ALLEMPLOYEES, {name: 'allemployees'}),
       "category": props.doccat
     }
   })
-}), graphql(ALLWAREHOUSES, {name: 'allwarehouses'}), graphql(CREATEDOCUMENT, {name: 'createdocument'}))(NewDocModal));
+}), graphql(ALLWAREHOUSES, {name: 'allwarehouses'}), graphql(CREATEDOCUMENT, {name: 'createdocument'}))(NewProductionDocModal));
