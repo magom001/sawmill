@@ -130,22 +130,22 @@ CREATE TABLE document (
 ALTER TABLE document OWNER TO magom001;
 
 --
--- Name: move_stack_document(integer, integer, integer, integer); Type: FUNCTION; Schema: factory; Owner: magom001
+-- Name: move_stack_document(integer, integer, integer, integer, integer, date); Type: FUNCTION; Schema: factory; Owner: postgres
 --
 
-CREATE FUNCTION move_stack_document(doctype integer, from_wh integer, to_wh integer, year integer) RETURNS document
+CREATE FUNCTION move_stack_document(doctype integer, from_wh integer, to_wh integer, year integer, e integer, dd date) RETURNS document
     LANGUAGE plpgsql
     AS $_$
 declare
-tmp document%rowtype;
+tmp factory.document%rowtype;
 begin
-insert into document(doctype, docyear, wh) values (2, $4, from_wh) returning * into tmp;
-insert into document(doctype, docyear,wh,doctype_ref,docyear_ref,docnum_ref,wh_ref) values ($1,$4, to_wh,tmp.doctype,tmp.docyear, tmp.docnum, tmp.wh) returning * into tmp;
+insert into factory.document(doctype, docyear, wh, employee, docdate) values (2, $4, from_wh, e,dd) returning * into tmp;
+insert into factory.document(doctype, docyear,wh,doctype_ref,docyear_ref,docnum_ref,wh_ref, employee, docdate) values ($1,$4, to_wh,tmp.doctype,tmp.docyear, tmp.docnum, tmp.wh, e, dd) returning * into tmp;
 return tmp;
 end;$_$;
 
 
-ALTER FUNCTION factory.move_stack_document(doctype integer, from_wh integer, to_wh integer, year integer) OWNER TO magom001;
+ALTER FUNCTION factory.move_stack_document(doctype integer, from_wh integer, to_wh integer, year integer, e integer, dd date) OWNER TO postgres;
 
 --
 -- Name: docdetail; Type: TABLE; Schema: factory; Owner: magom001
@@ -171,15 +171,15 @@ CREATE FUNCTION move_stock_docdetail(doctype integer, docyear integer, docnum in
     LANGUAGE plpgsql
     AS $_$
 declare
-doc document%rowtype;
-dd docdetail%rowtype;
+doc factory.document%rowtype;
+dd factory.docdetail%rowtype;
 begin
-select * into doc from document where document.doctype=$1 and document.docyear = $2 and document.docnum=$3;
+select * into doc from factory.document document where document.doctype=$1 and document.docyear = $2 and document.docnum=$3;
 if not found then
 raise exception 'Документ не найден';
 end if;
-insert into docdetail(doctype, docyear, docnum, wh, stackid, quantity) values(doc.doctype_ref, doc.docyear_ref, doc.docnum_ref, doc.wh_ref, stack, quantity);
-insert into docdetail(doctype, docyear, docnum, wh, stackid, quantity) values(doc.doctype, doc.docyear, doc.docnum, doc.wh, stack, quantity) returning * into dd;
+insert into factory.docdetail(doctype, docyear, docnum, wh, stackid, quantity) values(doc.doctype_ref, doc.docyear_ref, doc.docnum_ref, doc.wh_ref, stack, quantity);
+insert into factory.docdetail(doctype, docyear, docnum, wh, stackid, quantity) values(doc.doctype, doc.docyear, doc.docnum, doc.wh, stack, quantity) returning * into dd;
 return dd;
 end;$_$;
 
@@ -305,20 +305,37 @@ CREATE TABLE documents_employees (
 ALTER TABLE documents_employees OWNER TO magom001;
 
 --
+-- Name: warehouse; Type: TABLE; Schema: factory; Owner: magom001
+--
+
+CREATE TABLE warehouse (
+    id integer NOT NULL,
+    name text NOT NULL
+);
+
+
+ALTER TABLE warehouse OWNER TO magom001;
+
+--
 -- Name: documents_view; Type: VIEW; Schema: factory; Owner: magom001
 --
 
 CREATE VIEW documents_view AS
- SELECT document.doctype,
-    doctype.category,
-    doctype.docname,
-    document.docnum,
-    document.docyear,
-    document.docmonth,
-    document.docdate,
-    document.wh
-   FROM (document
-     JOIN doctype ON ((document.doctype = doctype.id)));
+ SELECT doc.doctype,
+    dt.category,
+    dt.docname,
+    doc.docnum,
+    doc.docyear,
+    doc.docmonth,
+    doc.docdate,
+    doc.wh,
+    wh1.name AS warehouse,
+    doc.wh_ref,
+    wh2.name AS warehouse_ref
+   FROM (((document doc
+     JOIN doctype dt ON ((doc.doctype = dt.id)))
+     JOIN warehouse wh1 ON ((doc.wh = wh1.id)))
+     LEFT JOIN warehouse wh2 ON ((doc.wh_ref = wh2.id)));
 
 
 ALTER TABLE documents_view OWNER TO magom001;
@@ -457,18 +474,6 @@ CREATE VIEW stacks_list_view AS
 
 
 ALTER TABLE stacks_list_view OWNER TO magom001;
-
---
--- Name: warehouse; Type: TABLE; Schema: factory; Owner: magom001
---
-
-CREATE TABLE warehouse (
-    id integer NOT NULL,
-    name text NOT NULL
-);
-
-
-ALTER TABLE warehouse OWNER TO magom001;
 
 --
 -- Name: stock_view; Type: VIEW; Schema: factory; Owner: magom001
@@ -618,6 +623,19 @@ COPY docdetail (doctype, docyear, docnum, stackid, wh, quantity) FROM stdin;
 1	2017	1	202065	1	434
 1	2017	1	202066	1	431
 1	2017	1	202067	1	200
+1	2017	2	202104	1	180
+1	2017	2	202105	1	180
+1	2017	2	202106	1	180
+1	2017	2	202107	1	180
+1	2017	2	202109	1	527
+1	2017	2	202110	1	527
+1	2017	2	202111	1	527
+1	2017	2	202112	1	527
+1	2017	2	202113	1	527
+1	2017	2	202114	1	527
+1	2017	2	202115	1	527
+1	2017	2	202108	1	195
+2	2017	1	202108	1	195
 \.
 
 
@@ -628,7 +646,10 @@ COPY docdetail (doctype, docyear, docnum, stackid, wh, quantity) FROM stdin;
 COPY doctype (id, docname, docsign, category) FROM stdin;
 3	Оприходование сушильных штабелей	1	\N
 1	Выпуск штабелей от ШФМ	1	выпуск
-2	Списание сушильных штабелей	-1	списание
+4	Выпуск штабелей от ручной раскладки	1	выпуск
+5	Загрузка сушильной камеры	1	перемещение
+2	Списание сушильных штабелей	-1	
+6	Списание на линию сортировки	-1	списание
 \.
 
 
@@ -636,7 +657,7 @@ COPY doctype (id, docname, docsign, category) FROM stdin;
 -- Name: doctype_id_seq; Type: SEQUENCE SET; Schema: factory; Owner: magom001
 --
 
-SELECT pg_catalog.setval('doctype_id_seq', 3, true);
+SELECT pg_catalog.setval('doctype_id_seq', 6, true);
 
 
 --
@@ -645,6 +666,10 @@ SELECT pg_catalog.setval('doctype_id_seq', 3, true);
 
 COPY document (doctype, docyear, docnum, docdate, wh, commentary, doctype_ref, docyear_ref, docnum_ref, wh_ref, employee, docmonth) FROM stdin;
 1	2017	1	2017-12-06	1	\N	\N	\N	\N	\N	3	12
+2	2017	1	2017-12-08	1	\N	\N	\N	\N	\N	1	12
+1	2017	2	2017-12-11	1	\N	\N	\N	\N	\N	4	12
+2	2017	2	2017-12-12	1	\N	\N	\N	\N	\N	1	12
+5	2017	1	2017-12-12	2	\N	2	2017	2	1	1	12
 \.
 
 
@@ -731,6 +756,18 @@ COPY stack (id, speciesid, dimensionid, lengthid, created_at) FROM stdin;
 202065	1	2	1	2017-12-07 19:22:45.616827
 202066	1	2	1	2017-12-07 19:23:25.002998
 202067	1	10	1	2017-12-07 19:28:21.494028
+202104	1	11	1	2017-12-12 09:45:37.759434
+202105	1	11	1	2017-12-12 09:45:48.578504
+202106	1	11	1	2017-12-12 09:45:51.228609
+202107	1	11	1	2017-12-12 09:45:53.126895
+202108	1	11	1	2017-12-12 09:45:55.020684
+202109	1	1	1	2017-12-12 09:46:24.206688
+202110	1	1	1	2017-12-12 09:46:30.295476
+202111	1	1	1	2017-12-12 09:46:34.548997
+202112	1	1	1	2017-12-12 09:46:35.706384
+202113	1	1	1	2017-12-12 09:46:36.717545
+202114	1	1	1	2017-12-12 09:46:39.380002
+202115	1	1	1	2017-12-12 09:46:40.31013
 \.
 
 
@@ -908,6 +945,14 @@ ALTER TABLE ONLY docdetail
 
 ALTER TABLE ONLY document
     ADD CONSTRAINT fk_document_document FOREIGN KEY (doctype_ref, docyear_ref, docnum_ref, wh_ref) REFERENCES document(doctype, docyear, docnum, wh);
+
+
+--
+-- Name: fk_document_wh_ref; Type: FK CONSTRAINT; Schema: factory; Owner: magom001
+--
+
+ALTER TABLE ONLY document
+    ADD CONSTRAINT fk_document_wh_ref FOREIGN KEY (wh_ref) REFERENCES warehouse(id);
 
 
 --
