@@ -11,7 +11,7 @@ class StockTable extends Component {
     } else {
       //console.log(this.props.data.allStockBySpecViews.nodes);
       const data = this.props.data.allStockBySpecViews.nodes;
-      const sumcount = data.reduce((p, c)=>{return {sum:p.sum+c.sum, vol: p.vol+c.vol}}, {sum:0, vol:0} );
+      const sumcount = data.reduce((p, c)=>{return {sum:parseInt(p.sum,10)+parseInt(c.sum,10), vol: parseFloat(p.vol)+parseFloat(c.vol)}}, {sum:0, vol:0} );
       console.log(sumcount);
       if(data.length===0) {
         return(
