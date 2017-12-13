@@ -2,13 +2,12 @@ import React, {Component} from 'react';
 import {graphql, compose} from 'react-apollo';
 import {REPORTQUERY} from '../../../queries';
 import {UPDATEDOCUMENT} from '../../../mutations';
-import WriteOffReportDetailsTable from './writeoffreportdetailstable';
+import TransferReportDetailsTable from './transferreportdetailstable';
 import CommentaryInput from '../utils/doccommentaryinput';
 
 class TransferReportDetails extends Component {
   changeCommentary = (commentary) => {
     const {doctype,docyear, docnum, wh} = this.props.match.params;
-    console.log(doctype, docyear, docnum, wh);
     this.props.updatedocument({
       variables: {
         "input": {
@@ -42,9 +41,9 @@ class TransferReportDetails extends Component {
             Склад списания: {`${doc.warehouseByWhRef.name}`}
           </p>
           <p>
-            Склад оприходования: {`${dc.warehouseByWh.name}`}
+            Склад оприходования: {`${doc.warehouseByWh.name}`}
           </p>
-          <WriteOffReportDetailsTable doctype={doc.doctype} docnum={doc.docnum} docyear={doc.docyear} wh={doc.wh}/>
+          <TransferReportDetailsTable doctype={doc.doctype} docnum={doc.docnum} docyear={doc.docyear} wh={doc.whRef}/>
           <CommentaryInput commentary={doc.commentary} save={this.changeCommentary}/>
         </div>
       );
