@@ -1,5 +1,13 @@
 import gql from 'graphql-tag';
 
+export const TRANSFERSTACK = gql`mutation TransferStack($input: MoveStockDocdetailInput!) {
+  moveStockDocdetail(input:$input) {
+   	docdetail {
+      stackid
+    }
+  }
+}`;
+
 export const CREATETRANSFERDOCUMENT = gql `mutation NewTransferDocument($input: MoveStackDocumentInput!) {
   moveStackDocument(input:$input) {
    document {

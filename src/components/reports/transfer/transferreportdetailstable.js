@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 import {graphql} from 'react-apollo';
 import {DocDetailsQuery} from '../../../queries';
 import {Table} from 'semantic-ui-react';
-import StackSelectForm from '../utils/stackselectform';
+import StackTransferForm from '../utils/stacktransferform';
 
 class TransferReportDetailsTable extends Component {
   render() {
@@ -44,7 +44,7 @@ class TransferReportDetailsTable extends Component {
           </Table.Header>
           <Table.Body>
             {rows}
-            <StackSelectForm doctype={this.props.doctype} docyear={this.props.docyear} docnum={this.props.docnum} wh={this.props.wh}  />
+            <StackTransferForm doctype={this.props.doctype} docyear={this.props.docyear} docnum={this.props.docnum} wh={this.props.wh}  />
           </Table.Body>
           <Table.Footer fullWidth>
             <Table.Row>
