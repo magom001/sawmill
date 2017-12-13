@@ -7,6 +7,7 @@ import WriteOffReportDetails from './writeoff/writeoffreportdetails';
 import WriteoffReports from './writeoff';
 import TransferReports from './transfer';
 import TransferReportDetails from './transfer/transferreportdetails';
+import Test from '../Test';
 
 class ReportsDashboard extends Component {
 
@@ -21,6 +22,7 @@ class ReportsDashboard extends Component {
           </Grid.Column>
           <Grid.Column width={11} textAlign="left">
             <Switch>
+              <Route exact path='/reports' component={Test} />
               <Route exact path='/reports/production' component={ProductionReports} />
               <Route path='/reports/production/:doctype/:docyear/:docnum/:wh' component={ProductionReportDetails} />
               <Route exact path='/reports/writeoff' component={WriteoffReports} />

@@ -1,14 +1,16 @@
-import React from 'react';
-//import PropTypes from 'prop-types';
+import React, { Component } from 'react';
+import Stock from './widgets/stock';
 
-const Dashboard = () => {
-  return (
-    <div>Dashboard</div>
-  );
+class Dashboard extends Component {
+
+  render() {
+    return (
+      <div>
+          <Stock />
+      </div>
+    );
+  }
+
 }
-
-// Dashboard.propTypes = {
-//
-// };
 
 export default Dashboard;

@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 
 const Test = ({}) => {
   return(
-    <div>TEST</div>
+    <div>Данный раздел находится в разработке</div>
   );
 }
 

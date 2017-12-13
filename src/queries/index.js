@@ -1,5 +1,17 @@
 import gql from 'graphql-tag';
 
+export const STOCKBYWH = gql`query StockByWh($wh:Int) {
+  allStockBySpecViews(condition: {wh:$wh}) {
+    nodes {
+      specification
+      wh
+      name
+      sum
+      vol
+    }
+  }
+}`;
+
 export const STACKSINWH = gql `query StacksInWh($wh:Int)
 {
   allStockViews(condition: {
