@@ -16,7 +16,7 @@ class ProductionReportDetailsTable extends Component {
         return (
           <DocDetail
             data = {d}
-            key={i} i={i}
+            key={d.stackid} i={i}
             doctype = {parseInt(this.props.doctype, 10)}
             docyear = {parseInt(this.props.docyear, 10)}
             docnum = {parseInt(this.props.docnum, 10)}
@@ -52,7 +52,7 @@ class ProductionReportDetailsTable extends Component {
             <StackInputForm doctype={this.props.doctype} docyear={this.props.docyear} docnum={this.props.docnum} wh={this.props.wh}  />
           </Table.Body>
           <Table.Footer fullWidth>
-            <Table.Row>              
+            <Table.Row>
               <Table.HeaderCell colSpan='8'>
                 <DocTotals data = {data} />
               </Table.HeaderCell>

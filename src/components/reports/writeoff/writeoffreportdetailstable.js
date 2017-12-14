@@ -19,7 +19,7 @@ class WriteOffReportDetailsTable extends Component {
         return (
           <DocDetail
             data = {d}
-            key={i} i={i}
+            key={d.stackid} i={i}
             doctype = {parseInt(this.props.doctype, 10)}
             docyear = {parseInt(this.props.docyear, 10)}
             docnum = {parseInt(this.props.docnum, 10)}
