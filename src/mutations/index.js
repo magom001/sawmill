@@ -1,5 +1,19 @@
 import gql from 'graphql-tag';
 
+export const CANCELTRANSFER = gql`mutation CancelStackTransfer($input: CancelStackTransferInput!) {
+  cancelStackTransfer(input:$input){
+    clientMutationId
+  }
+}`;
+
+export const UPDATEDOCDETAIL = gql`mutation UpdateDocDetail($input: UpdateDocdetailByDoctypeAndDocyearAndDocnumAndStackidInput!) {
+  updateDocdetailByDoctypeAndDocyearAndDocnumAndStackid(input:$input) {
+    docdetail {
+      stackid
+    }
+  }
+}`;
+
 export const TRANSFERSTACK = gql`mutation TransferStack($input: MoveStockDocdetailInput!) {
   moveStockDocdetail(input:$input) {
    	docdetail {

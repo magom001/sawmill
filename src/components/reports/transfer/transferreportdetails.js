@@ -27,6 +27,7 @@ class TransferReportDetails extends Component {
       return <div>Загрузка...</div>
     } else {
       const doc = this.props.productionreportquery.documentByDoctypeAndDocnumAndDocyearAndWh;
+      
       return (
         <div>
           <center>

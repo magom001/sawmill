@@ -3,6 +3,8 @@ import {graphql} from 'react-apollo';
 import {DocDetailsQuery} from '../../../queries';
 import {Table} from 'semantic-ui-react';
 import StackTransferForm from '../utils/stacktransferform';
+import DocTotals from '../utils/doctotals';
+import DocDetail from '../utils/docdetail';
 
 class TransferReportDetailsTable extends Component {
   render() {
@@ -16,20 +18,30 @@ class TransferReportDetailsTable extends Component {
         let stackvol = parseFloat((d.stackByStackid.dimensionByDimensionid.thicknessMm*d.stackByStackid.dimensionByDimensionid.widthMm*d.stackByStackid.lengthByLengthid.lengthMm*d.quantity)/1000000000).toFixed(3);
         totalvol +=parseFloat(stackvol);
         return (
-          <Table.Row key={i}>
-            <Table.Cell collapsing>{i+1}.</Table.Cell>
-            <Table.Cell collapsing>{d.stackid}</Table.Cell>
-            <Table.Cell>{d.stackByStackid.speciesBySpeciesid.name}</Table.Cell>
-            <Table.Cell>{d.stackByStackid.dimensionByDimensionid.thicknessMm}*{d.stackByStackid.dimensionByDimensionid.widthMm}</Table.Cell>
-            <Table.Cell>{d.stackByStackid.lengthByLengthid.lengthMm}</Table.Cell>
-            <Table.Cell>{d.quantity}</Table.Cell>
-            <Table.Cell>{stackvol}</Table.Cell>
-            <Table.Cell></Table.Cell>
-          </Table.Row>
+          <DocDetail
+            data = {d}
+            key={i} i={i}
+            doctype = {parseInt(this.props.doctype, 10)}
+            docyear = {parseInt(this.props.docyear, 10)}
+            docnum = {parseInt(this.props.docnum, 10)}
+            wh = {parseInt(this.props.wh, 10)}
+            transfer={true}
+           />
+
+          //  <Table.Row key={i}>
+          //    <Table.Cell collapsing>{i+1}.</Table.Cell>
+          //    <Table.Cell collapsing>{d.stackid}</Table.Cell>
+          //    <Table.Cell>{d.stackByStackid.speciesBySpeciesid.name}</Table.Cell>
+          //    <Table.Cell>{d.stackByStackid.dimensionByDimensionid.thicknessMm}*{d.stackByStackid.dimensionByDimensionid.widthMm}</Table.Cell>
+          //    <Table.Cell>{d.stackByStackid.lengthByLengthid.lengthMm}</Table.Cell>
+          //    <Table.Cell style={{textAlign: "right"}} collapsing>{d.quantity}</Table.Cell>
+          //    <Table.Cell style={{textAlign: "right"}} collapsing>{d.stackVol.toFixed(3)}</Table.Cell>
+          //    <Table.Cell></Table.Cell>
+          //  </Table.Row>
         )
       })
       return (
-        <Table celled singleLine={true} size="small">
+        <Table singleLine={true} size="small">
           <Table.Header>
             <Table.Row>
               <Table.HeaderCell></Table.HeaderCell>
@@ -37,8 +49,8 @@ class TransferReportDetailsTable extends Component {
               <Table.HeaderCell>порода</Table.HeaderCell>
               <Table.HeaderCell>сечение, мм</Table.HeaderCell>
               <Table.HeaderCell>длина, мм</Table.HeaderCell>
-              <Table.HeaderCell>кол-во, шт.</Table.HeaderCell>
-              <Table.HeaderCell>объем, м3</Table.HeaderCell>
+              <Table.HeaderCell collapsing style={{textAlign: "right"}}>кол-во, шт.</Table.HeaderCell>
+              <Table.HeaderCell collapsing style={{textAlign:"right"}}>объем, м3</Table.HeaderCell>
               <Table.HeaderCell></Table.HeaderCell>
             </Table.Row>
           </Table.Header>
@@ -48,8 +60,9 @@ class TransferReportDetailsTable extends Component {
           </Table.Body>
           <Table.Footer fullWidth>
             <Table.Row>
-              <Table.HeaderCell></Table.HeaderCell>
-              <Table.HeaderCell colSpan='7'>Количество перемещенных штабелей: {data.length} | объем: {totalvol.toFixed(3)} </Table.HeaderCell>
+              <Table.HeaderCell colSpan='8'>
+                <DocTotals data = {data} />
+              </Table.HeaderCell>
             </Table.Row>
           </Table.Footer>
         </Table>

@@ -27,8 +27,8 @@ class TransferReportsTable extends Component {
               <Table.Cell>{d.docname}</Table.Cell>
               <Table.Cell collapsing>{d.docnum}/{d.docyear}</Table.Cell>
               <Table.Cell collapsing>{d.docdate}</Table.Cell>
-              <Table.Cell>{d.warehouse}</Table.Cell>
               <Table.Cell>{d.warehouseRef}</Table.Cell>
+              <Table.Cell>{d.warehouse}</Table.Cell>
             </Table.Row>
           )
         })

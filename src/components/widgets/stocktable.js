@@ -67,6 +67,7 @@ export default graphql(STOCKBYWH, {
   options: (props) => ({
     variables: {
       "wh": props.wh
-    }
+    },
+    fetchPolicy: 'network-only'
   })
 })(StockTable);

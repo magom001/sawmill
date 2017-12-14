@@ -100,7 +100,8 @@ export default compose(graphql(STACKSINWH, {
   options: (props) => ({
     variables: {
       "wh": parseInt(props.wh, 10)
-    }
+    },
+    fetchPolicy: 'network-only'
   })
 }), graphql(CREATEDOCDETAIL, {
   name: 'createdocdetail',

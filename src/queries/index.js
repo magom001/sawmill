@@ -95,18 +95,22 @@ export const DocDetailsQuery = gql `query ProductionReportDetails($doctype: Int,
     nodes {
       stackid
       stackByStackid {
+        speciesid
         speciesBySpeciesid {
           name
         }
+        dimensionid
         dimensionByDimensionid {
           thicknessMm
           widthMm
         }
+        lengthid
         lengthByLengthid {
           lengthMm
         }
       }
       quantity
+      stackVol
     }
   }
 }`;
