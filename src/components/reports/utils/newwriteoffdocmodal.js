@@ -5,7 +5,7 @@ import {withRouter} from 'react-router-dom';
 import {ALLEMPLOYEES, DOCTYPES, ALLWAREHOUSES} from '../../../queries';
 import {CREATEDOCUMENT} from '../../../mutations';
 
-class NewProductionDocModal extends Component {
+class NewWriteOffDocModal extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -53,9 +53,9 @@ class NewProductionDocModal extends Component {
           }
         }
       }).then(({data}) => {
-        
+
         const {doctype, docyear, docnum, wh} = data.createDocument.document;
-        this.props.history.push(`/reports/production/${doctype}/${docyear}/${docnum}/${wh}`);
+        this.props.history.push(`/reports/writeoff/${doctype}/${docyear}/${docnum}/${wh}`);
       }).catch((error) => {
         this.setState({error:"Произошла ошибка"});
       });
@@ -196,4 +196,4 @@ export default withRouter(compose(graphql(ALLEMPLOYEES, {name: 'allemployees'}),
       "category": props.doccat
     }
   })
-}), graphql(ALLWAREHOUSES, {name: 'allwarehouses'}), graphql(CREATEDOCUMENT, {name: 'createdocument'}))(NewProductionDocModal));
+}), graphql(ALLWAREHOUSES, {name: 'allwarehouses'}), graphql(CREATEDOCUMENT, {name: 'createdocument'}))(NewWriteOffDocModal));

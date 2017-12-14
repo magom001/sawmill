@@ -54,6 +54,7 @@ export default compose(graphql(REPORTQUERY, {
       "year": parseInt(props.match.params.docyear, 10),
       "docnum": parseInt(props.match.params.docnum, 10),
       "wh": parseInt(props.match.params.wh, 10)
-    }
+    },
+    fetchPolicy: 'network-only'
   })
 }), graphql(UPDATEDOCUMENT, {name: 'updatedocument'}))(ProductionReportDetails);

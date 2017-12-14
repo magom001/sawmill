@@ -2,7 +2,7 @@ import React, {Component} from 'react';
 import YearsTab from '../utils/yearstab';
 import MonthsTab from '../utils/monthstab';
 import WriteOffReportsTable from './writeoffreportstable';
-import NewProductionDocModal from '../utils/newproductiondocmodal';
+import NewWriteOffDocModal from '../utils/newwriteoffdocmodal';
 
 class WriteoffReports extends Component {
   constructor(props) {
@@ -27,7 +27,7 @@ class WriteoffReports extends Component {
         <MonthsTab selectedMonth={this.state.selectedMonth} changeMonth={this.changeMonth}/>
         <br/>
         <br/>
-        <NewProductionDocModal doccat="списание" wh={1} />
+        <NewWriteOffDocModal doccat="списание" wh={1} />
         <h1>Отчёты о списании пиломатериалов</h1>
         <WriteOffReportsTable year={this.state.selectedYear} month={this.state.selectedMonth}/>
       </div>
