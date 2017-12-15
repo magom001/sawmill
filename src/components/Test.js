@@ -1,14 +1,14 @@
 import React from 'react';
-import PropTypes from 'prop-types';
+//import PropTypes from 'prop-types';
 
-const Test = ({}) => {
+const Test = () => {
   return(
     <div>Данный раздел находится в разработке</div>
   );
 }
-
-Test.propTypes = {
-
-};
+//
+// Test.propTypes = {
+//
+// };
 
 export default Test;

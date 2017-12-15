@@ -12,10 +12,10 @@ class WriteOffReportDetailsTable extends Component {
       return <div>Загрузка...</div>
     } else {
       const data = this.props.data.allDocdetails.nodes;
-      let totalvol = 0.00;
+    //  let totalvol = 0.00;
       let rows = data.map((d, i) => {
-        let stackvol = parseFloat((d.stackByStackid.dimensionByDimensionid.thicknessMm*d.stackByStackid.dimensionByDimensionid.widthMm*d.stackByStackid.lengthByLengthid.lengthMm*d.quantity)/1000000000).toFixed(3);
-        totalvol +=parseFloat(stackvol);
+        // let stackvol = parseFloat((d.stackByStackid.dimensionByDimensionid.thicknessMm*d.stackByStackid.dimensionByDimensionid.widthMm*d.stackByStackid.lengthByLengthid.lengthMm*d.quantity)/1000000000).toFixed(3);
+        // totalvol +=parseFloat(stackvol);
         return (
           <DocDetail
             data = {d}
