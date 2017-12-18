@@ -33,7 +33,7 @@ class Stock extends Component {
             </Grid.Column>
           </Grid.Row>
           <Grid.Row>
-            <Grid.Column width={4}>
+            <Grid.Column width={6}>
               <Menu fluid vertical tabular>
                 {warehouses}
                 {/* <Menu.Item name='bio' active={this.state.whid === 'bio'} onClick={this.handleItemClick}/>
@@ -43,7 +43,7 @@ class Stock extends Component {
               </Menu>
             </Grid.Column>
 
-            <Grid.Column stretched width={12}>
+            <Grid.Column stretched width={10}>
               <StockTable wh={this.state.whid} />
             </Grid.Column>
           </Grid.Row>
