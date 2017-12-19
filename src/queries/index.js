@@ -1,5 +1,15 @@
 import gql from 'graphql-tag';
 
+export const STOCK = gql`{
+  allStockBySpecViews {
+    nodes {
+      specification
+      name
+      vol
+    }
+  }
+}`;
+
 export const STACKBYID = gql`query StackById ($id: String!) {
   stackById(id:$id) {
     id

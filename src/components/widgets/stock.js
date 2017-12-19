@@ -2,7 +2,9 @@ import React, {Component} from 'react';
 import {graphql, compose} from 'react-apollo';
 import {ALLWAREHOUSES} from '../../queries';
 import StockTable from './stocktable';
+import StockToolBar from './toolbar';
 import {Grid, Menu} from 'semantic-ui-react';
+
 
 class Stock extends Component {
   constructor(props) {
@@ -18,8 +20,8 @@ class Stock extends Component {
     if (this.props.warehouses.loading) {
       return <div>Загрузка...</div>
     } else {
-      const warehouses = this.props.warehouses.allWarehouses.nodes.map((wh, i)=> {
-        return <Menu.Item key={i} name={wh.name} whid={wh.id} active={this.state.whid === wh.id} onClick={this.handleItemClick} />
+      const warehouses = this.props.warehouses.allWarehouses.nodes.map((wh, i) => {
+        return <Menu.Item key={i} name={wh.name} whid={wh.id} active={this.state.whid === wh.id} onClick={this.handleItemClick}/>
       });
       return (
         <Grid style={{
@@ -30,6 +32,11 @@ class Stock extends Component {
               <center>
                 <h2>Остатки пиломатериалов на производственных участках</h2>
               </center>
+            </Grid.Column>
+          </Grid.Row>
+          <Grid.Row>
+            <Grid.Column width={16}>
+              <StockToolBar />
             </Grid.Column>
           </Grid.Row>
           <Grid.Row>
@@ -44,7 +51,7 @@ class Stock extends Component {
             </Grid.Column>
 
             <Grid.Column stretched width={10}>
-              <StockTable wh={this.state.whid} />
+              <StockTable wh={this.state.whid}/>
             </Grid.Column>
           </Grid.Row>
         </Grid>
