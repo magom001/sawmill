@@ -1,12 +1,16 @@
 import React, {Component} from 'react';
-import {Table, Dropdown} from 'semantic-ui-react';
-import {graphql} from 'react-apollo';
-import {UNLOADKD} from '../../../mutations';
+import {Table, Dropdown, Modal, Button, Icon} from 'semantic-ui-react';
+import {graphql, compose} from 'react-apollo';
+import {UNLOADKD, CANCELTRANSFERDOC} from '../../../mutations';
 import {DocDetailsQuery, STACKSINWH} from '../../../queries';
+import {withRouter} from 'react-router-dom';
 
 class MenuBar extends Component {
+  state = {
+    open: false
+  }
   handleMenuItemClick = () => {
-    this.props.mutate({
+    this.props.unloadkd({
       variables: {
         "input": {
           "doctype": parseInt(this.props.doctype, 10),
@@ -16,14 +20,48 @@ class MenuBar extends Component {
       }
     })
   }
+  cancelTransfer = () => {
+    this.props.canceltransfer({
+      variables: {
+        "input": {
+          "_doctype": parseInt(this.props.match.params.doctype, 10),
+          "_docyear": parseInt(this.props.match.params.docyear, 10),
+          "_docnum": parseInt(this.props.match.params.docnum, 10),
+          "_wh": parseInt(this.props.match.params.wh, 10)
+        }
+      }
+    }).then(()=>{
+      this.props.history.push("/reports/transfer");
+    }).catch((err)=>{
+      console.log(err);
+    });
+  }
   render() {
-    console.log(this.props);
     return (
       <Table.Row>
         <Table.HeaderCell collapsing>
           <Dropdown item icon='bars' simple>
             <Dropdown.Menu>
-              <Dropdown.Item name="unloadkd" onClick={() => this.handleMenuItemClick()}>Выгрузить камеру</Dropdown.Item>
+              <Dropdown.Item name="unloadkd" onClick={() => this.handleMenuItemClick()}>Переместить всё</Dropdown.Item>
+              <Dropdown.Divider/>
+              <Modal open={this.state.open} size="tiny" trigger={< Dropdown.Item name = "delete_report" onClick = {
+                () => this.setState({open: true})
+              } > Удалить отчёт < /Dropdown.Item>}>
+                <Modal.Header>
+                  <Icon name="warning sign"/>Внимание!
+                </Modal.Header>
+                <Modal.Content>
+                  <p>Вы уверены, что хотите удалить отчёт?</p>
+                </Modal.Content>
+                <Modal.Actions>
+                  <Button negative onClick={() => this.setState({open: false})}>
+                    Отменить
+                  </Button>
+                  <Button positive onClick={() => this.cancelTransfer()}>
+                    Подтвердить
+                  </Button>
+                </Modal.Actions>
+              </Modal>
             </Dropdown.Menu>
           </Dropdown>
 
@@ -35,7 +73,8 @@ class MenuBar extends Component {
 
 }
 
-export default graphql(UNLOADKD, {
+MenuBar = compose(graphql(UNLOADKD, {
+  name: "unloadkd",
   options: (props) => ({
     refetchQueries: [
       {
@@ -56,4 +95,6 @@ export default graphql(UNLOADKD, {
       }
     ]
   })
-})(MenuBar);
+}), graphql(CANCELTRANSFERDOC, {name: "canceltransfer"}))(MenuBar);
+
+export default withRouter(MenuBar);

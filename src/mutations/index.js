@@ -1,5 +1,11 @@
 import gql from 'graphql-tag';
 
+export const CANCELTRANSFERDOC = gql`mutation cancel_transfer($input:CancelTransferInput!) {
+  cancelTransfer(input:$input) {
+    clientMutationId
+  }
+}`;
+
 export const UNLOADKD = gql`mutation UnloadKD($input: UnloadKdInput!) {
   unloadKd(input:$input) {
     clientMutationId

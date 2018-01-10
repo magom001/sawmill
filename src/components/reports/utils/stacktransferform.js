@@ -15,7 +15,7 @@ class StackTransferForm extends Component {
   }
   submitForm = () => {
     const {doctype, docnum, docyear, wh} = this.props;
-    console.log(doctype, docnum, docyear, wh);
+
     if (!this.state.stackid) {
       alert("Выберите штабель")
     } else if (!Number.isInteger(this.state.quantity)) {
@@ -34,7 +34,7 @@ class StackTransferForm extends Component {
           }
         }
       }).then(({data}) => {
-        console.log(data);
+        //console.log(data);
       }).catch((error) => {
         alert(error.message);
       });

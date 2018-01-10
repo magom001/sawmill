@@ -76,6 +76,7 @@ export default compose(graphql(DocDetailsQuery, {
       doctype: parseInt(props.doctype, 10),
       year: parseInt(props.docyear, 10),
       docnum: parseInt(props.docnum, 10)
-    }
+    },
+    fetchPolicy: 'network-only'
   })
 }))(TransferReportDetailsTable);
